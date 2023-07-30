@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Timer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .timer {
+      align-content: center;
+    }
+
+    .time {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      font-size: 16px;
+      padding: 10px 20px;
+      margin: 5px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="timer">
+    <div class="time">00:00:00:00</div>
+    <input type="number" id="timerInput" placeholder="Enter time in minutes">
+    <button class="start">Start</button>
+    <button class="stop">Stop</button>
+    <button class="reset">Reset</button>
+  </div>
+  <script>
+    const timeDisplay = document.querySelector('.time');
+    const timerInput = document.getElementById('timerInput');
+    const startBtn = document.querySelector('.start');
+    const stopBtn = document.querySelector('.stop');
+    const resetBtn = document.querySelector('.reset');
+
+    let timer;
+    let startTime;
+    let remainingTime = 0;
+    let isRunning = false;
+
+    function formatTime(time) {
+      const hours = Math.floor(time / 3600000);
+      const minutes = Math.floor((time % 3600000) / 60000);
+      const seconds = Math.floor((time % 60000) / 1000);
+      const milliseconds = time % 1000;
+
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}:${milliseconds.toString().padStart(2, '0')}`;
+    }
+
+    function updateDisplay() {
+      timeDisplay.textContent = formatTime(remainingTime);
+    }
+
+    function startTimer() {
+      if (!isRunning) {
+        const inputValue = parseInt(timerInput.value, 10);
+        if (isNaN(inputValue) || inputValue <= 0) {
+          alert("Please enter a valid positive number of minutes.");
+          return;
+        }
+
+        isRunning = true;
+        remainingTime = inputValue * 60000; // Convert minutes to milliseconds
+        startTime = Date.now();
+        updateDisplay();
+        timer = setInterval(function() {
+          const currentTime = Date.now();
+          const elapsedTime = currentTime - startTime;
+          remainingTime = Math.max(0, remainingTime - elapsedTime);
+          startTime = currentTime;
+
+          if (remainingTime === 0) {
+            stopTimer();
+            alert("Time's up!");
+          }
+
+          updateDisplay();
+        }, 10);
+      }
+    }
+
+    function stopTimer() {
+      if (isRunning) {
+        clearInterval(timer);
+        isRunning = false;
+      }
+    }
+
+    function resetTimer() {
+      stopTimer();
+      remainingTime = 0;
+      timerInput.value = "";
+      updateDisplay();
+    }
+
+    startBtn.addEventListener('click', startTimer);
+    stopBtn.addEventListener('click', stopTimer);
+    resetBtn.addEventListener('click', resetTimer);
+  </script>
+</body>
+</html>
